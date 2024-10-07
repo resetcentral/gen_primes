@@ -46,15 +46,47 @@ fn init_wheel_factorization(max_size: usize) -> (VecDeque<usize>, usize, Vec<usi
     }
 }
 
+
+fn is_prime(n: usize, primes: &[usize]) -> bool {
+    for prime in primes {
+        if n % prime == 0 {
+            return false;
+        }
+    }
+    return true;
+}
+
+fn sieve(wheel: &mut VecDeque<usize>, span: usize, primes: &mut Vec<usize>, search_max: usize) {
+    let mut idx = 1;
+    loop {
+        let n = wheel[idx];
+        wheel[idx] += span;
+        if is_prime(n, &primes) {
+            if n > search_max {
+                return;
+            }
+            primes.push(n);
+        }
+
+        idx = (idx + 1) % wheel.len();
+    }
+}
+
+
 fn main() {
     const MAX_SIZE: usize = 134217728; // 1GB of u64 values
-    let (wheel, product, primes) = init_wheel_factorization(MAX_SIZE);
+    let (mut wheel, product, mut primes) = init_wheel_factorization(MAX_SIZE);
+    wheel[0] += product;
+
     println!("{:?}", primes);
     println!();
     println!("Final Product: {}", product);
     println!();
     // println!("{:#?}", wheel);
     println!("Wheel size: {}", wheel.len());
+    sieve(&mut wheel, product, &mut primes, 10_000);
+    println!("{:?}", primes);
+
     // Initialize wheel factorization
     // load from file
     // 
